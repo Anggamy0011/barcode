@@ -1,5 +1,4 @@
-// models/qrModel.js
-const db = require('../config/configDB');
+const db = require("../config/configDB");
 
 const insertQRData = (
   qr_code_id,
@@ -7,8 +6,7 @@ const insertQRData = (
   nama,
   kelas,
   mapel,
-  hari,
-  minggu_ke,
+  tanggal,
   jam_awal,
   jam_akhir,
   expired,
@@ -16,14 +14,31 @@ const insertQRData = (
 ) => {
   const query = `
     INSERT INTO qr_codes (
-      qr_code_id, nidn, nama, kelas, mapel, hari,
-      minggu_ke, jam_awal, jam_akhir, expired, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+      qr_code_id, nidn, nama, kelas, mapel, tanggal,
+      jam_awal, jam_akhir, expired, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
   `;
+
+  // Convert expired timestamp ms ke MySQL DATETIME
+  const expiredDateTime = new Date(expired);
+  const expiredStr = expiredDateTime
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", " ");
 
   db.query(
     query,
-    [qr_code_id, nidn, nama, kelas, mapel, hari, minggu_ke, jam_awal, jam_akhir, expired],
+    [
+      qr_code_id,
+      nidn,
+      nama,
+      kelas,
+      mapel,
+      tanggal,
+      jam_awal,
+      jam_akhir,
+      expiredStr,
+    ],
     callback
   );
 };
@@ -39,5 +54,5 @@ const getQRById = (qr_code_id, callback) => {
 
 module.exports = {
   insertQRData,
-  getQRById
+  getQRById,
 };

@@ -1,68 +1,59 @@
-// controllers/qrController.js
-const { insertQRData } = require('../models/qrModel');
-const QRCode = require('qrcode');
+const { v4: uuidv4 } = require("uuid");
+const { insertQRData } = require("../models/qrModel");
 
-exports.generateQR = async (req, res) => {
+exports.generateQR = (req, res) => {
   try {
-    const {
-      qr_code_id,
-      nidn,
-      nama,
-      kelas,
-      mapel,
-      hari,
-      minggu_ke,
-      jam_awal,
-      jam_akhir,
-      expired,
-    } = req.body;
+    const { nidn, nama, kelas, mapel, tanggal, jam_awal, jam_akhir } = req.body;
 
-    // Validasi lengkap
     if (
-      !qr_code_id || !nidn || !nama || !kelas || !mapel ||
-      !hari || !minggu_ke || !jam_awal || !jam_akhir || !expired
+      !nidn ||
+      !nama ||
+      !kelas ||
+      !mapel ||
+      !tanggal ||
+      !jam_awal ||
+      !jam_akhir
     ) {
-      return res.status(400).json({ error: 'Data tidak lengkap' });
+      return res.status(400).json({ error: "Data tidak lengkap" });
     }
 
-    // Data untuk QR Code (JSON yang nanti bisa dibaca saat scan)
-    const qrContent = JSON.stringify({
-      qr_code_id,
-    });
+    const moment = require("moment-timezone");
 
-    // Simpan ke database (panggil model lama)
+    const qr_code_id = uuidv4();
+
+    // Simpan tanggal sesuai WIB
+    const tanggalWIB = moment(tanggal).tz("Asia/Jakarta").format("YYYY-MM-DD");
+
+    // Expired 1 jam dari sekarang, WIB
+    const expiredWIB = moment()
+      .tz("Asia/Jakarta")
+      .add(1, "hour")
+      .format("YYYY-MM-DD HH:mm:ss");
+
     insertQRData(
       qr_code_id,
       nidn,
       nama,
       kelas,
       mapel,
-      hari,
-      minggu_ke,
+      tanggal,
       jam_awal,
       jam_akhir,
       expired,
-      async (err, result) => {
+      (err) => {
         if (err) {
-          console.error('DB Error:', err);
-          return res.status(500).json({ error: 'Gagal menyimpan QR ke database' });
+          console.error("DB Error:", err);
+          return res.status(500).json({ error: "Gagal simpan ke database" });
         }
 
-        try {
-          const qrImage = await QRCode.toDataURL(qrContent);
-          return res.status(201).json({
-            message: 'QR code berhasil dibuat',
-            qrImage,
-            qrData: JSON.parse(qrContent),
-          });
-        } catch (qrError) {
-          console.error('QR Generation Error:', qrError);
-          return res.status(500).json({ error: 'Gagal membuat QR code' });
-        }
+        res.status(201).json({
+          message: "QR code berhasil dibuat",
+          qrData: { qr_code_id },
+        });
       }
     );
   } catch (e) {
-    console.error('Unexpected Error:', e);
-    return res.status(500).json({ error: 'Terjadi kesalahan server' });
+    console.error("Unexpected Error:", e);
+    return res.status(500).json({ error: "Terjadi kesalahan server" });
   }
 };

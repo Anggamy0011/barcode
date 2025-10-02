@@ -19,6 +19,7 @@
     "expo-camera": "~16.1.11",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "moment-timezone": "^0.6.0",
     "mysql2": "^3.14.2",
     "qrcode": "^1.5.4",
     "uuid": "^11.1.0"
