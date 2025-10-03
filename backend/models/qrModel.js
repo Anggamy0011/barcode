@@ -19,13 +19,6 @@ const insertQRData = (
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
   `;
 
-  // Convert expired timestamp ms ke MySQL DATETIME
-  const expiredDateTime = new Date(expired);
-  const expiredStr = expiredDateTime
-    .toISOString()
-    .slice(0, 19)
-    .replace("T", " ");
-
   db.query(
     query,
     [
@@ -37,7 +30,7 @@ const insertQRData = (
       tanggal,
       jam_awal,
       jam_akhir,
-      expiredStr,
+      expired,
     ],
     callback
   );
@@ -52,7 +45,19 @@ const getQRById = (qr_code_id, callback) => {
   });
 };
 
+const getAllQR = (callback) => {
+  const query = "SELECT * FROM qr_codes ORDER BY created_at DESC";
+  db.query(query, callback);
+};
+
+const getTodayQRSessions = (callback) => {
+  const query = "SELECT * FROM qr_codes WHERE tanggal = CURDATE()";
+  db.query(query, callback);
+};
+
 module.exports = {
   insertQRData,
   getQRById,
+  getAllQR,
+  getTodayQRSessions,
 };

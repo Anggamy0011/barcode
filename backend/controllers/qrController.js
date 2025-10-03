@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
-const { insertQRData } = require("../models/qrModel");
+const { insertQRData, getAllQR } = require("../models/qrModel");
 
 exports.generateQR = (req, res) => {
   try {
@@ -36,10 +36,10 @@ exports.generateQR = (req, res) => {
       nama,
       kelas,
       mapel,
-      tanggal,
+      tanggalWIB,
       jam_awal,
       jam_akhir,
-      expired,
+      expiredWIB,
       (err) => {
         if (err) {
           console.error("DB Error:", err);
@@ -56,4 +56,14 @@ exports.generateQR = (req, res) => {
     console.error("Unexpected Error:", e);
     return res.status(500).json({ error: "Terjadi kesalahan server" });
   }
+};
+
+exports.getAllQRData = (req, res) => {
+  getAllQR((err, data) => {
+    if (err) {
+      console.error("DB Error:", err);
+      return res.status(500).json({ error: "Gagal mengambil data QR dari database" });
+    }
+    res.json(data);
+  });
 };

@@ -16,4 +16,9 @@ exports.getAllSiswaFromDB = (callback) => {
   db.query(query, callback);
 };
 
+exports.getSiswaByKelas = (kelas, callback) => {
+  const query = "SELECT nisn, nama, kelas FROM siswa WHERE kelas = ?";
+  db.query(query, [kelas], callback);
+};
+
 

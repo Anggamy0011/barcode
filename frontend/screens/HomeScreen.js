@@ -35,6 +35,14 @@ export default function HomeScreen({ navigation, route }) {
       >
         <Text style={styles.absenText}>Scan QR untuk Absen</Text>
       </TouchableOpacity>
+
+      {/* Tombol Izin */}
+      <TouchableOpacity
+        style={[styles.absenButton, { marginTop: 12, backgroundColor: "#1976d2" }]}
+        onPress={() => navigation.navigate("Izin")}
+      >
+        <Text style={styles.absenText}>Ajukan Izin</Text>
+      </TouchableOpacity>
     </View>
   );
 }

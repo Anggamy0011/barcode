@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Text,
   View,
@@ -17,6 +17,7 @@ export default function ScanScreen({ navigation, route }) {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [loading, setLoading] = useState(false);
+  const isHandlingRef = useRef(false);
 
 
   const [nisn, setNisn] = useState("");
@@ -49,7 +50,9 @@ export default function ScanScreen({ navigation, route }) {
   }, []);
 
   const handleBarCodeScanned = async ({ data }) => {
-    if (scanned || loading) return;
+    if (scanned || loading || isHandlingRef.current) return;
+
+    isHandlingRef.current = true;
 
     setScanned(true);
     setLoading(true);
@@ -81,10 +84,23 @@ export default function ScanScreen({ navigation, route }) {
         ]
       );
     } catch (error) {
+      const serverMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Gagal menghubungi server.";
       console.log("Error:", error?.response?.data || error.message);
-      Alert.alert("❌ Error", "Gagal menghubungi server.");
-      setScanned(false);
-      setLoading(false);
+      Alert.alert("❌ Error", serverMessage, [
+        {
+          text: "OK",
+          onPress: () => {
+            setScanned(false);
+            setLoading(false);
+          },
+        },
+      ]);
+    } finally {
+      isHandlingRef.current = false;
     }
   };
 
