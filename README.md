@@ -33,9 +33,13 @@ cd ../frontend
 npm install
 ```
 
-2) Konfigurasi database MySQL
-- Buat database `sistem_absensi`
-- Sesuaikan `backend/config/configDB.js` bila perlu.
+2) Setup Database MySQL
+- Install MySQL 8.x atau gunakan XAMPP/WAMP
+- Jalankan skrip database:
+```bash
+mysql -u root -p < database/setup_complete.sql
+```
+- Sesuaikan `backend/config/configDB.js` bila perlu (host, user, password)
 
 3) Jalankan backend
 ```bash
@@ -78,6 +82,9 @@ frontend/
   navigation/AppNavigator.js
   screens/* (Login, Register, Scan, GuruHome, Izin, dsb.)
   utils/api.js
+database/
+  setup_complete.sql (setup lengkap dalam satu file)
+  README.md (panduan database)
 ```
 
 ## Endpoint Utama (ringkas)
